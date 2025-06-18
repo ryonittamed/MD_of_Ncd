@@ -1,0 +1,32 @@
+[INPUT]
+grotopfile = ../top/alf3.top # topology file
+grocrdfile = ../gro/free.gro # coordinate file
+rstfile    = ./sim1.rst      # restart file
+
+[OUTPUT]
+pdbfile = ./sim2.pdb # PDB output
+dcdfile = ./sim2.dcd # DCD trajectory
+rstfile = ./sim2.rst # restart file
+
+[ENERGY]
+forcefield          = RESIDCG # Residue-level CG models
+electrostatic       = CUTOFF  # Debye-Huckel model
+cg_pairlistdist_exv = 15.0    # Neighbor-list distance
+
+[MINIMIZE]
+method           =   SD    # [SD]
+nsteps           =   3000  # number of minimization steps
+eneout_period    =   10    # energy output period
+crdout_period    =   10    # coordinates output period
+rstout_period    =   1000  # restart output period
+nbupdate_period  =   10    # nonbond update period
+tol_rmsg         =   0.0   # tolerance of convergence
+
+[CONSTRAINTS]
+rigid_bond = NO # don't apply constraints
+
+[BOUNDARY]
+type       = PBC    # periodic boundary condition
+box_size_x = 1000.0 # box size in x direction
+box_size_y = 1000.0 # box size in y direction
+box_size_z = 1000.0 # box size in z direction
