@@ -5,6 +5,7 @@ simulations in the paper:
 
 
 **Structural transitions in kinesin minus-end directed microtubule motility**
+
 DOI: https://doi.org/10.1101/2024.07.29.605428
 
 
