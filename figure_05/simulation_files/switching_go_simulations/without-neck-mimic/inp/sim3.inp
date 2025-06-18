@@ -1,0 +1,39 @@
+[INPUT]
+grotopfile = ../top/alf3.top # topology file
+grocrdfile = ../gro/free.gro # coordinate file
+rstfile    = ./sim2.rst      # restart file
+
+[OUTPUT]
+pdbfile = ./sim3.pdb # PDB output
+dcdfile = ./sim3.dcd # DCD trajectory
+rstfile = ./sim3.rst # restart file
+
+[ENERGY]
+forcefield          = RESIDCG # Residue-level CG models
+electrostatic       = CUTOFF  # Debye-Huckel model
+cg_pairlistdist_exv = 15.0    # Neighbor-list distance
+
+[DYNAMICS]
+integrator      = VVER_CG # velocity-verlet propagation
+nsteps          = 2000000 # number of MD steps
+timestep        = 0.010   # timestep size (ps)
+eneout_period   = 100     # energy output interval
+crdout_period   = 100     # trajectory output interval
+rstout_period   = 2000000 # restart output interval
+nbupdate_period = 20      # pairlist update interval
+iseed           = XXXXX   # rng seed
+
+[CONSTRAINTS]
+rigid_bond = NO # don't apply constraints
+
+[ENSEMBLE]
+ensemble    = NVT      # Canonical ensemble
+tpcontrol   = LANGEVIN # Langevin thermostat
+temperature = 300      # simulation temperature
+gamma_t     = 0.01     # thermostat friction parameter
+
+[BOUNDARY]
+type       = PBC    # periodic boundary condition
+box_size_x = 1000.0 # box size in x direction
+box_size_y = 1000.0 # box size in y direction
+box_size_z = 1000.0 # box size in z direction
