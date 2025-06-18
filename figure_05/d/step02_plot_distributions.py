@@ -48,16 +48,10 @@ def plot_2d_kde_with_marginals(df_x: pd.DataFrame, df_y: pd.DataFrame, save_path
     ax_main = fig.add_subplot(grid[1:, :-1])
     sns.kdeplot(x=df_x["theta"], y=df_x["phi"], color=colors.without_neckmimic, fill=False, ax=ax_main, thresh=.002, linewidth=2.0)
     sns.kdeplot(x=df_y["theta"], y=df_y["phi"], color=colors.with_neckmimic, fill=False, ax=ax_main, thresh=.002, linewidth=2.0)
-    #ax_main.set_xlabel(r"$\theta$ ($rad$)")
-    #ax_main.set_ylabel(r"$\phi$ ($rad$)")
     ax_main.set_xlim(1, 3)
     ax_main.set_ylim(0, 6)
 
     # x軸とy軸の目盛り (locatorを適用)
-    #x_ticks = np.arange(1, 3, 1)
-    #y_ticks = np.arange(0, 6, 1)
-    #ax_main.set_xticks(x_ticks)
-    #ax_main.set_yticks(y_ticks)
     ax_main.xaxis.set_major_locator(ticker.MultipleLocator(0.5))
     ax_main.yaxis.set_major_locator(ticker.MultipleLocator(1.0))
 
@@ -132,7 +126,6 @@ def main():
     # dirごとにdistributionをプロットする
     for i,dirname in enumerate(args.dirs):
       # List all the parquet files
-      #paths = [str(file) for file in pathlib.Path(dirname).rglob("*.parquet")]
       paths = [str(file) for file in pathlib.Path(dirname).rglob(f"{args.state}.csv")]
       paths = sorted(paths)
 
@@ -140,7 +133,6 @@ def main():
       df_list = []
       indexs = []
       for path in paths:
-          #df = pd.read_parquet(path)
           print(path)
           df = pd.read_csv(path)
 
@@ -152,7 +144,6 @@ def main():
           sim5 = df.iloc[22600:42600]
 
           # Unwrap angles
-          #df = unwrap_angles(sim3)
           df = unwrap_angles(df)
 
           #不自然なpathを除外
@@ -165,11 +156,8 @@ def main():
       data = pd.concat(df_list)
       print(data)
       print(f"Number of data of {dirname}:",len(df_list))
-      #data.to_csv(Path(args.out_dir) / f"{args.state}.csv")
-      #exit()
 
       # Plot scatter
-      #sampled_data = data.sample(n=min(10000, len(data)), random_state=42)
       sampled_data = data
       if i==0:
         x_min, x_max, y_min, y_max = sampled_data['theta'].min(), sampled_data['theta'].max(), sampled_data['phi'].min(), sampled_data['phi'].max()
@@ -178,36 +166,12 @@ def main():
       print(f"{x_max=}")
       print(f"{y_max=}")
 
-      #plt.scatter(sampled_data['theta'], sampled_data['phi'], s=1)
-      #plt.xlim(x_min, x_max)
-      #plt.ylim(y_min, y_max)
-      #plt.xlabel(r"$\theta$ ($rad$)")
-      #plt.ylabel(r"$\phi$ ($rad$)")
-      #filename = Path(dirname).name + f'_{args.state}.png'
-      #plt.savefig(Path(args.out_dir) / filename, dpi=300)
-      #plt.close()
-
-      
-       
-
-
-      # Plot distribution
-      #sns.kdeplot(sampled_data, x='theta', y='phi', fill=True, thresh=.002)
-      #plt.xlim(x_min, x_max)
-      #plt.ylim(y_min, y_max)
-      #plt.xlabel(r"$\theta$ ($rad$)")
-      #plt.ylabel(r"$\phi$ ($rad$)")
-      #filename = Path(dirname).name + f'_kde_{args.state}.png'
-      #plt.savefig(Path(args.out_dir) / filename, dpi=300)
-      #plt.close()
-
       # add data to all_data
       data['case'] = Path(dirname).name
       all_data_list.append(data)
     
     # plot all data
     all_data = pd.concat(all_data_list)
-    #sampled_data = all_data.sample(n=min(1000, len(data)), random_state=42) #for debug
     sampled_data = all_data.copy()
 
     # フォントとフォントサイズの設定

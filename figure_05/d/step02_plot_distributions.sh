@@ -1,15 +1,7 @@
 #!/bin/bash -e
 
-OUT_DIR="step02_plot_distributions.out"
-DATA_DIR="step01_write_cv.out"
-
-###############################################
-# Case kinesin
-###############################################
-CASE_DIR="kinesin"
-
 # Create output directory
-mkdir -p "${OUT_DIR}"
+mkdir -p /path/to/output/dir
 
 # Plot cv files
 uv run \
@@ -20,11 +12,10 @@ uv run \
   --with fastparquet \
   --with seaborn \
     ./step02_plot_distributions.py \
-      --dir "${DATA_DIR}/kinesin.equiliblium"  "${DATA_DIR}/kinesin-no-neckmimic.equiliblium"\
-      --out "${OUT_DIR}" \
+      --dir /path/to/kinesin.equiliblium  /path/to/kinesin-no-neckmimic.equiliblium\
+      --out /path/to/output/dir \
       --state "free"
 
-# Plot cv files
 uv run \
   --with polars \
   --with matplotlib \
@@ -33,7 +24,7 @@ uv run \
   --with fastparquet \
   --with seaborn \
     ./step02_plot_distributions.py \
-      --dir "${DATA_DIR}/kinesin.equiliblium"  "${DATA_DIR}/kinesin-no-neckmimic.equiliblium"\
-      --out "${OUT_DIR}" \
+      --dir /path/to/kinesin.equiliblium  /path/to/kinesin-no-neckmimic.equiliblium\
+      --out /path/to/output/dir \
       --state "alf3"
 
