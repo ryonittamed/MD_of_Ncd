@@ -22,3 +22,6 @@ the inp directory and atdyn was copied there, you would need to execute:
 mpirun -np 1 ./atdyn ./alf3.inp
 mpirun -np 1 ./atdyn ./free.inp
 ```
+
+### Note
+In this work we used seed values from 1 to 100.
