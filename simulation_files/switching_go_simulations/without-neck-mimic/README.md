@@ -23,3 +23,6 @@ mpirun -np 1 ./atdyn ./sim1.inp
 mpirun -np 1 ./atdyn ./sim2.inp
 mpirun -np 1 ./atdyn ./sim3.inp
 ```
+
+### Note
+In this work we used seed values from 1 to 100.
