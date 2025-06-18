@@ -1,8 +1,12 @@
 # MD_of_Ncd
 
 This repository contains the scripts and input files for performing the
-simulations in the **Structural transitions in kinesin minus-end directed microtubule motility**
-paper.
+simulations in the paper:
+
+
+**Structural transitions in kinesin minus-end directed microtubule motility**
+DOI: https://doi.org/10.1101/2024.07.29.605428
+
 
 ## Content
 
