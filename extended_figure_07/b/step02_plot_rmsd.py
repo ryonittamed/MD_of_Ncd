@@ -186,37 +186,13 @@ def main():
     parser.add_argument("--dir-kinesin", type=str, required=True, help="Directory containing CVs in csv format")
     parser.add_argument("--dir-no-kinesin", type=str, required=True, help="Directory containing CVs in csv format")
     parser.add_argument("--out", type=str, required=True, help="Output file name")
-    parser.add_argument("--raw-data", type=str, required=True, help="Raw Data file name")
     parser.add_argument("--state", type=str, required=True, help="free or alf3")
     args = parser.parse_args()
 
-    #colors = generate_colors(len(args.dirs))
-    #labels = [Path(path).stem for path in args.dirs]
-
-    #for color, csv_dir, label in zip(colors, args.dirs, labels):
-    #  rmsd_list = load_rmsd(csv_dir, average_window=1000)
-    #  for i,rmsd in enumerate(rmsd_list):
-    #    #plt.plot(rmsd, color=color, label=label if i==0 else None, linewidth=0.2)
-    #    # Split trajectory
-    #    sim1 = rmsd.iloc[:2000]
-    #    sim2 = rmsd.iloc[2000:2300]
-    #    sim3 = rmsd.iloc[2300:22300]
-    #    sim4 = rmsd.iloc[22300:22600]
-    #    sim5 = rmsd.iloc[22600:42600]
-    #    colors_ = generate_colors(5)
-    #    for c,sim in zip(colors_, [sim1, sim2, sim3, sim4, sim5]):
-    #      plt.plot(sim, color=c, linewidth=0.2)
-    #    # Split trajectory
-    
     df_list_kinesin = load_stalk_rmsd(args.dir_kinesin, state=args.state, average_window=None)
     df_list_no_kinesin = load_stalk_rmsd(args.dir_no_kinesin, state=args.state, average_window=None)
 
     plot_mean_and_std_two_groups(df_list_kinesin, df_list_no_kinesin, save_path=args.out)
-    #save_mean_std_two_groups(df_list_kinesin, df_list_no_kinesin, args.raw_data, list1_name="neckmimic", list2_name="no-neckmimic")         
-
-    #plt.legend()
-    #plt.savefig(args.out, dpi=300)
-    #plt.close()
 
       
 

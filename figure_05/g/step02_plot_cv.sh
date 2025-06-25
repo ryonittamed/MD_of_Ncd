@@ -1,15 +1,7 @@
 #!/bin/bash -e
 
-OUT_DIR="step02_plot_cv.out"
-DATA_DIR="step01_write_cv.out"
-
-###############################################
-# Case kinesin
-###############################################
-CASE_DIR="kinesin"
-
 # Create output directory
-mkdir -p "${OUT_DIR}/${CASE_DIR}"
+mkdir -p /path/to/out_dir
 
 # Plot cv files
 uv run \
@@ -20,9 +12,8 @@ uv run \
   --with fastparquet \
   --with seaborn \
     ./step02_plot_cv.py \
-      --dir "${DATA_DIR}/${CASE_DIR}" \
-      --out "${OUT_DIR}/${CASE_DIR}/out.pdf" \
-      --raw-data "${OUT_DIR}/${CASE_DIR}/data.csv"
+      --dir /path/to/data_dir \
+      --out /path/to/out_dir/out.pdf \
 
 
 

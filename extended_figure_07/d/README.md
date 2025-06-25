@@ -1,100 +1,105 @@
-# Kinesin RMSD Stage-wise Analysis Pipeline
 
-This README describes the scripts used to calculate and visualize the RMSD (Root Mean Square Deviation) of kinesin molecular dynamics simulations across different experimental conditions and stages.
+# RMSD Analysis Pipeline for Kinesin Simulations (Standard and Experiment 05)
 
-## Overview
+This repository contains a set of scripts for calculating and visualizing RMSD (root-mean-square deviation) of kinesin systems with or without the neck mimic domain from molecular dynamics (MD) simulations. It includes both standard analysis and specific analysis tailored for Experiment 05.
 
-The analysis pipeline includes the following steps:
+## Directory Structure
 
-1. **Calculate RMSD** from trajectory and topology files.
-2. **Plot RMSD** time series for different conditions (`free`, `alf3`) and experimental setups.
-3. **Stage-wise analysis** of RMSD over segmented trajectory intervals (e.g., Stage 1: initial, Stage 2: docking, Stage 3: stable).
-
-## File Descriptions
-
-### `step01_calculate_rmsd.py`
-
-Calculates the RMSD from `.dcd` trajectory and `.pdb` topology files for a specified residue region.
-
-- **Inputs**:
-  - `--dcd`: DCD trajectory file path
-  - `--pdb`: PDB topology file path
-  - `--target-region`: Residue selection string (e.g., `"resid 7516-8266"`)
-  - `--out`: Output CSV file path
-
-- **Output**: CSV file with `rmsd` column for each timestep
-
----
-
-### `step01_calculate_rmsd.sh`
-
-Runs the RMSD calculation for all simulation replicates across multiple experimental setups (`free`, `alf3` for `kinesin` and `kinesin-no-neckmimic`).
-
-- **Output Directory**: `step01_calculate_rmsd.out/`
-
----
-
-### `step02_plot_rmsd.py`
-
-Plots the **mean and standard deviation** of RMSD trajectories across replicates for each condition.
-
-- **Inputs**:
-  - `--dir`: Directory containing simulation CSV files
-  - `--out`: Output plot file (PDF)
-  - `--raw-data`: Output CSV summarizing mean, std, ±1SD
-  - `--state`: `free` or `alf3`
-
----
-
-### `step02_plot_rmsd.sh`
-
-Automates plotting for all experimental groups in `experiment-09`.
-
-- **Output Directory**: `step02_plot_rmsd.out/experiment-09/...`
-
----
-
-### `step03_plot_rmsd_exp5.py`
-
-Plots RMSD over three defined stages:
-
-- Stage 1: `0–2000`
-- Stage 2: `2000–2300`
-- Stage 3: `2300–22300`
-
-Each stage is plotted in a different color with shaded standard deviation.
-
-- **Inputs**:
-  - `--dir`: Directory of CSV files
-  - `--out`: Output PDF path
-  - `--raw-data`: CSV file summarizing mean and standard deviation
-
----
-
-### `step03_plot_rmsd_exp5.sh`
-
-Runs the stage-wise RMSD analysis and plotting for `experiment-05` on both `kinesin` and `kinesin-no-neckmimic`.
-
-- **Output Directory**: `step02_plot_rmsd.out/experiment-05/...`
-
----
+```
+.
+├── step01_calculate_rmsd.py     # Calculate RMSD for individual trajectories
+├── step01_calculate_rmsd.sh     # Bash script to run RMSD calculation for multiple simulations
+├── step02_plot_rmsd.py          # Plot RMSD time series with mean ± std bands (standard analysis)
+├── step02_plot_rmsd.sh          # Bash script to automate step02 plotting
+├── step03_plot_rmsd_exp5.py     # Specialized plot for Experiment 05 with phase segmentation
+├── step03_plot_rmsd_exp5.sh     # Bash script to automate step03 plotting
+├── output/                      # Output files (csv, pdf)
+└── input/                       # Input trajectory and topology files
+```
 
 ## Requirements
 
-- Python packages: `MDAnalysis`, `numpy`, `pandas`, `matplotlib`, `polars`, `pyarrow`, `fastparquet`
-- `uv` environment manager for running scripts with dependencies
+- Python >= 3.8
+- Python libraries:
+  - numpy
+  - pandas
+  - matplotlib
+  - MDAnalysis
+  - pathlib
 
-## Usage Summary
+## Step 1: Calculate RMSD
+
+**Script:** `step01_calculate_rmsd.py`  
+**Example usage:**
 
 ```bash
-# Step 1: Calculate RMSD
+python step01_calculate_rmsd.py \
+  --target-region "resid 7516-8266" \
+  --dcd /path/to/trajectory.dcd \
+  --pdb /path/to/topology.pdb \
+  --out /path/to/output/trajectory.csv
+```
+
+Or execute in batch:
+
+```bash
 bash step01_calculate_rmsd.sh
+```
 
-# Step 2: Plot average RMSD over time
+**Note:** Please modify the file paths in the bash scripts according to your environment.
+
+## Step 2: Plot RMSD Time Series (Standard)
+
+**Script:** `step02_plot_rmsd.py`  
+**Example usage:**
+
+```bash
+python step02_plot_rmsd.py \
+  --dir /path/to/data_dir \
+  --out /path/to/output/out.pdf \
+  --state free
+```
+
+Or execute in batch:
+
+```bash
 bash step02_plot_rmsd.sh
+```
 
-# Step 3: Plot segmented stage-wise RMSD
+**Note:** Please modify the file paths in the bash scripts according to your environment.
+
+## Step 3: Plot RMSD for Experiment 05
+
+This step segments the RMSD time series into three predefined stages:
+
+- Stage 1: 0–2000 steps
+- Stage 2: 2000–2300 steps
+- Stage 3: 2300–22300 steps
+
+**Script:** `step03_plot_rmsd_exp5.py`  
+**Example usage:**
+
+```bash
+python step03_plot_rmsd_exp5.py \
+  --dir /path/to/data_dir \
+  --out /path/to/output/out.pdf
+```
+
+Or execute in batch:
+
+```bash
 bash step03_plot_rmsd_exp5.sh
 ```
 
+**Note:** Please modify the file paths in the bash scripts according to your environment.
 
+## Output
+
+- CSV files containing RMSD time series
+- PDF plots visualizing RMSD with mean ± standard deviation bands
+- For Experiment 05, plots segmented into three distinct phases with different colors
+
+## Notes
+
+- This pipeline uses MDAnalysis for RMSD calculation relative to the initial structure for specified regions.
+- The plotting scripts provide both general time series plots and specialized segmented views for particular experimental designs.

@@ -121,36 +121,25 @@ def plot_mean_with_std_dual_axis(data1, data2, output_path):
     #ax2 = ax1.twinx()  # 右軸を追加
 
     # Data 1 のプロット（右軸）
-    #ax1.plot(time_steps / 10**2, means1, linestyle='-', color=colors.with_neckmimic, label="with neck-mimic", linewidth=2.0)
     ax1.plot(time_steps / 10**2, means1, linestyle='-', color=colors.with_neckmimic, label="", linewidth=2.0)
     ax1.fill_between(time_steps / 10**2, std_devs1_lower, std_devs1_upper, color=colors.with_neckmimic, alpha=0.2)
 
     # Data 2 のプロット（左軸）
-    #ax1.plot(time_steps / 10**2, means2, linestyle='-', color=colors.without_neckmimic, label="without neck-mimic", linewidth=2.0)
     ax1.plot(time_steps / 10**2, means2, linestyle='-', color=colors.without_neckmimic, label="", linewidth=2.0)
     ax1.fill_between(time_steps / 10**2, std_devs2_lower, std_devs2_upper, color=colors.without_neckmimic, alpha=0.2)
 
     # 軸のスケール調整
-    #ax1.set_ylim(means2[0] * 0.9 , means2[-1] * 1.2)  # 左軸は Data 2
-    #ax2.set_ylim(means1[0] * 0.9 , means1[-1] * 1.2)  # 右軸は Data 1（スケール調整済み）
     ax1.set_ylim(0.5, 3.0)
 
     # 軸ラベル
-    #ax1.set_xlabel(r"MD steps ($\times 10^4$)", fontsize=40, fontname="Arial")
-    #ax1.set_ylabel(r"$\phi$ ($rad$)", fontsize=40, fontname="Arial")
     ax1.tick_params(axis='both', labelsize=30)
 
     # グリッド設定
     ax1.grid(True, linestyle="--", linewidth=0.5, alpha=0.7)
 
     # 凡例の設定
-    #ax1.legend(fontsize=30)
-    #ax2.legend(loc="upper right", fontsize=12)
     ax1.spines["top"].set_visible(False)
     
-    # 軸の目盛りの数値だけ非表示にする（目盛り線や軸線は残す）
-    ax1.set_xticklabels([])
-    ax1.set_yticklabels([])
 
     # 保存ディレクトリの作成（存在しない場合）
     output_path = Path(output_path)
@@ -246,18 +235,13 @@ def main():
 
           # Extract only transition part
           df, pth = extract_transition(df)
-          print(f"{df=}")
           if pth == 'path1':
             phis.append(df['phi'].to_list()[:1200])
             count += 1
-      print(f"Number of valid simulations in {paths}:", count)
       sims.append(phis)
 
-    print(f"{len(sims[0])=}")
-    print(f"{len(sims[1])=}")
 
     plot_mean_with_std_dual_axis(sims[0], sims[1], args.out)
-    #save_mean_median_percentile_dual_axis(sims[0], sims[1], args.raw_data, data1_name="neckmimic", data2_name="no-neckmimic", percent=10)
 
 if __name__ == "__main__":
     main()

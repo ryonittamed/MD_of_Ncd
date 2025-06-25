@@ -149,7 +149,6 @@ def main():
         "contact_resids_in_neckmimic": ret['contact_resids_in_neckmimic'],
         "docks": ret['docks'],
     })
-    print(df)
 
 
     # Save dataframe

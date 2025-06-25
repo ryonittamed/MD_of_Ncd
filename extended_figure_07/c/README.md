@@ -1,124 +1,95 @@
-# Kinesin Contact Transition Analysis via Collective Variables
 
-This repository provides a reproducible analysis pipeline for visualizing collective variable (CV) transitions — such as angular movement and residue contact — during kinesin simulations, with a focus on the neck-mimic binding process.
+# Contact Map and CV Analysis Pipeline for Kinesin Simulations
 
----
+This repository contains a set of scripts for calculating and visualizing collective variables (CVs), including theta, phi, RMSD, contact ratio, and residue-specific contact maps for kinesin systems with and without the neck mimic domain.
 
-## Repository Structure
+## Directory Structure
 
 ```
-├── step01_write_cv.py      # Calculates angles (θ, φ) and contact-related CVs per trajectory
-├── step01_write_cv.sh      # Batch process for writing CVs across all simulations
-├── step02_plot_cv.py       # Summarizes and visualizes neckmimic-residue contact heatmaps
-├── step02_plot_cv.sh       # Batch plotting script
-├── config.py               # Contains neckmimic residue mapping and metadata
+.
+├── step01_write_cv.py           # Extract CVs (theta, phi, RMSD, contact ratio, contact map) from trajectories
+├── step01_write_cv.sh           # Bash script to run CV extraction for multiple simulations
+├── step02_plot_cv.py            # Plot residue-specific contact heatmaps
+├── step02_plot_cv.sh            # Bash script to automate plotting
+├── config.py                    # Configuration for residue mappings
+├── output/                      # Output files (csv, parquet, pdf)
+└── input/                       # Input trajectory and topology files
 ```
 
----
+## Requirements
 
-## Step 1: Calculate Collective Variables
+- Python >= 3.8
+- Python libraries:
+  - numpy
+  - pandas
+  - polars
+  - matplotlib
+  - seaborn
+  - pyarrow
+  - fastparquet
+  - MDAnalysis
+  - tqdm
+  - msm_utils (for native contact analysis)
 
-### `step01_write_cv.py`
+## Step 1: Extract Collective Variables
 
-Processes trajectory files to compute:
-- θ and φ angles of the stalk vector (projected onto MT coordinate axes)
-- Native contact ratio and RMSD via `angle_vs_contacts`
-- Contact frequency with neck-mimic residues
+**Script:** `step01_write_cv.py`  
+**Example usage:**
 
-#### Key Arguments
-- `--sel-stalk1/2`: Stalk residue selections (e.g., `resid 7516-7568`)
-- `--sel-msu1/2/3`: MT coordinate system reference selections
-- `--dcd`, `--pdb`, `--itp`: Trajectory, topology, and ITP file
-- `--out`: Output `.csv` file
-
-#### Output CSV
-- `theta`, `phi`: Angles in radians
-- `contact_count_ratio`, `rmsd`
-- `contact_resids_in_neckmimic`: Contact dict {resid: count}
-- `docks`: Contact presence flag {resid: bool}
-
----
-
-### `step01_write_cv.sh`
-
-Batch executes `step01_write_cv.py` for 100 simulations under the `kinesin` case.
-
-- Reads input trajectories from:
-  ```
-  ../../4EA4-231F/experiment-05/kinesin/sim-xxxx/
-  ```
-- Outputs are stored in:
-  ```
-  step01_write_cv.out/kinesin/sim-xxxx/trajectory.csv
-  ```
-
----
-
-## Step 2: Plot Contact Residue Transitions
-
-### `step02_plot_cv.py`
-
-Summarizes and visualizes neckmimic-residue contacts over transition trajectories.
-
-#### Key Functions
-
-- Filters `phi`-based forward transitions ("path1")
-- Extracts ±50 frame windows around the docking point
-- Aggregates contact counts for neckmimic residues
-- Generates normalized and raw heatmaps
-- Outputs:
-  - Heatmap (PDF)
-  - Contact matrix (CSV)
-  - Docking occurrence map
-
-#### Required Arguments
-- `--dir`: Input directory of CV CSV files
-- `--out`: Path for normalized PDF output
-- `--non-norm-out`: Unnormalized PDF output
-- `--dock-out`: Binary docked-residue map
-- `--raw-data`: Output matrix CSV
-- `--target`: Optional, filter to one simulation
-
----
-
-### `step02_plot_cv.sh`
-
-Wrapper script to run `step02_plot_cv.py` on the full kinesin dataset.
-
-Results are saved under:
-```
-step02_plot_cv.out/kinesin/
-  ├── norm_out.pdf
-  ├── no_norm_out.pdf
-  ├── dock_out.pdf
-  ├── data.csv
+```bash
+python step01_write_cv.py \
+  --sel-stalk1 "resid 7516-7568" \
+  --sel-stalk2 "resid 7899-7951" \
+  --sel-msu1 "resid 836-1252" \
+  --sel-msu2 "resid 2506-2922" \
+  --sel-msu3 "resid 4593-5010" \
+  --dcd /path/to/trajectory.dcd \
+  --pdb /path/to/topology.pdb \
+  --itp /path/to/topology.itp \
+  --out /path/to/output/trajectory.csv
 ```
 
----
+Or execute in batch:
 
-## config.py
+```bash
+bash step01_write_cv.sh
+```
 
-Defines:
-- `Neckmimic.neckmimic_range`: Residues 7884–7898
-- `Neckmimic.resname_dict`: Mapping from residue index to label
+**Note:** Please modify the file paths in the bash scripts according to your environment.
 
-Used for heatmap x-axis formatting and column renaming.
+## Step 2: Plot Contact Heatmap
 
----
+**Script:** `step02_plot_cv.py`  
+**Example usage:**
 
-## Dependencies
+```bash
+python step02_plot_cv.py \
+  --dir /path/to/data_dir \
+  --out /path/to/output/heatmap.pdf
+```
 
-Install via `uv` or `pip`:
-- `numpy`, `pandas`, `polars`
-- `matplotlib`, `seaborn`
-- `MDAnalysis`, `pyarrow`, `fastparquet`
-- `tqdm`
+Or execute in batch:
 
----
+```bash
+bash step02_plot_cv.sh
+```
+
+**Note:** Please modify the file paths in the bash scripts according to your environment.
+
+## Output
+
+- CSV or parquet files containing the CVs: theta, phi, RMSD, contact ratio, and detailed contact residues
+- PDF heatmaps showing the time evolution of contact frequencies between the neck mimic and target residues
+
+## Configuration
+
+The file `config.py` contains definitions for:
+- Residue ID ranges (`neckmimic_range`)
+- Mappings from residue IDs to formatted labels (`resname_dict`)
 
 ## Notes
 
-- Only forward rotational transitions (positive φ, "path1") are analyzed
-- Contact metrics depend on the docking point defined by contact ratio > 0.99
-- Useful for studying neck-mimic residue interactions across multiple simulations
-
+- This pipeline uses MDAnalysis for trajectory handling.
+- Spherical angles (`theta`, `phi`) are calculated relative to a dynamically defined coordinate system based on microtubule subunits.
+- Contact count ratio and RMSD are computed using `msm_utils` based native contact analysis.
+- The heatmap highlights contact formation dynamics during the transition of the neck mimic binding.

@@ -78,7 +78,6 @@ def main():
 
     #Save dataframe
     df = pd.DataFrame({"ncd_rmsd": ncd_rmsd, "stalk_rmsd": stalk_rmsd})
-    print(df)
     df.to_csv(args.out)
 
 if __name__=="__main__":

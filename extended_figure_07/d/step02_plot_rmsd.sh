@@ -1,81 +1,40 @@
 #!/bin/bash -e
 
-OUT_DIR="step02_plot_rmsd.out"
-DATA_DIR="step01_calculate_rmsd.old.out"
+# Define input/output directories
+OUT_DIR="/path/to/output_dir"
+DATA_DIR="/path/to/input_dir"
 
 # Create output directory
-mkdir -p "${OUT_DIR}/"
+mkdir -p "${OUT_DIR}"
 
+# Function to plot RMSD
+plot_rmsd() {
+  local CASE_PATH=$1
+  local STATE=$2
 
-##############################################################
-# Experiment 09
-#############################################################
-EXP_TYPE="experiment-09"
+  mkdir -p "${OUT_DIR}/${CASE_PATH}/${STATE}"
 
-CASE="kinesin"
-STATE="free"
-mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}"
-
-# Plot cv files
-uv run \
-  --with polars \
-  --with matplotlib \
-  --with pandas \
-  --with pyarrow \
-  --with fastparquet \
+  uv run \
+    --with polars \
+    --with matplotlib \
+    --with pandas \
+    --with pyarrow \
+    --with fastparquet \
     ./step02_plot_rmsd.py \
-      --dir "${DATA_DIR}/${EXP_TYPE}/${CASE}"\
-      --out "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/out.pdf" \
-      --raw-data "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/data.csv" \
+      --dir "${DATA_DIR}/${CASE_PATH}" \
+      --out "${OUT_DIR}/${CASE_PATH}/${STATE}/out.pdf" \
       --state ${STATE}
+}
 
-CASE="kinesin-no-neckmimic"
-STATE="free"
-mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}"
+###############################################
+# Process all cases
+###############################################
 
-# Plot cv files
-uv run \
-  --with polars \
-  --with matplotlib \
-  --with pandas \
-  --with pyarrow \
-  --with fastparquet \
-    ./step02_plot_rmsd.py \
-      --dir "${DATA_DIR}/${EXP_TYPE}/${CASE}"\
-      --out "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/out.pdf" \
-      --raw-data "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/data.csv" \
-      --state ${STATE}
+# kinesin
+plot_rmsd "kinesin" "free"
+plot_rmsd "kinesin" "alf3"
 
-CASE="kinesin"
-STATE="alf3"
-mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}"
+# kinesin-no-neckmimic
+plot_rmsd "kinesin-no-neckmimic" "free"
+plot_rmsd "kinesin-no-neckmimic" "alf3"
 
-# Plot cv files
-uv run \
-  --with polars \
-  --with matplotlib \
-  --with pandas \
-  --with pyarrow \
-  --with fastparquet \
-    ./step02_plot_rmsd.py \
-      --dir "${DATA_DIR}/${EXP_TYPE}/${CASE}"\
-      --out "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/out.pdf" \
-      --raw-data "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/data.csv" \
-      --state ${STATE}
-
-CASE="kinesin-no-neckmimic"
-STATE="alf3"
-mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}"
-
-# Plot cv files
-uv run \
-  --with polars \
-  --with matplotlib \
-  --with pandas \
-  --with pyarrow \
-  --with fastparquet \
-    ./step02_plot_rmsd.py \
-      --dir "${DATA_DIR}/${EXP_TYPE}/${CASE}"\
-      --out "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/out.pdf" \
-      --raw-data "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/data.csv" \
-      --state ${STATE}

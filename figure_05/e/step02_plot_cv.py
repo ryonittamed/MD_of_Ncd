@@ -121,26 +121,20 @@ def plot_mean_with_std_dual_axis(data1, data2, output_path):
     ax2 = ax1.twinx()  # 右軸を追加
 
     # Data 1 のプロット（右軸）
-    #ax2.plot(time_steps / 10**2, medians1, linestyle='-', color=colors.contact_ratio, label="Neck-mimic contact ratio")
     ax2.plot(time_steps / 10**2, medians1, linestyle='-', color=colors.contact_ratio, label="")
     ax2.fill_between(time_steps / 10**2, std_devs1_lower, std_devs1_upper, color=colors.contact_ratio, alpha=0.2)
 
     # Data 2 のプロット（左軸）
-    #ax1.plot(time_steps / 10**2, medians2, linestyle='-', color=colors.with_neckmimic, label=r"$\phi$ ($rad$)")
     ax1.plot(time_steps / 10**2, medians2, linestyle='-', color=colors.with_neckmimic, label="")
     ax1.fill_between(time_steps / 10**2, std_devs2_lower, std_devs2_upper, color=colors.with_neckmimic, alpha=0.2)
 
     # 軸のスケール調整
-    #ax2の縦軸を0.0から3.0までにする
     scale_min = 0.5 / means2[0]
     scale_max = 3.0 / means2[-1]
     ax1.set_ylim(means2[0] * scale_min , means2[-1] * scale_max)  # 左軸は Data 2
     ax2.set_ylim(means1[0] * scale_min , means1[-1] * scale_max)  # 右軸は Data 1（スケール調整済み）
 
     # 軸ラベル
-    #ax1.set_xlabel(r"MD steps ($\times 10^4$)", fontsize=40, fontname="Arial")
-    #ax1.set_ylabel(r"$\phi$ ($rad$)", fontsize=40, fontname="Arial")
-    #ax2.set_ylabel('Neck-mimic contact ratio', fontsize=40, fontname="Arial")
     ax1.tick_params(axis='both', labelsize=30)
     ax2.tick_params(axis='both', labelsize=30)
 
@@ -148,19 +142,12 @@ def plot_mean_with_std_dual_axis(data1, data2, output_path):
     ax1.grid(True, linestyle="--", linewidth=0.5, alpha=0.7)
 
     # 凡例の設定
-    #ax1.legend(loc="lower right", fontsize=12)
-    #ax2.legend(loc="lower right", fontsize=12)
     ax1.spines["top"].set_visible(False)
     ax2.spines["top"].set_visible(False)
 
     # 保存ディレクトリの作成（存在しない場合）
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)  # 親ディレクトリを作成
-
-    ## 軸の目盛りの数値だけ非表示にする（目盛り線や軸線は残す）
-    ax1.set_xticklabels([])
-    ax1.set_yticklabels([])
-    ax2.set_yticklabels([])
 
     # 画像の保存
     plt.savefig(output_path, dpi=300, facecolor='white', format="pdf")
@@ -248,17 +235,13 @@ def main():
 
         # Extract only transition part
         df, pth = extract_transition(df)
-        print(f"{df=}")
         if pth == 'path1':
           contact_count_ratios.append(df['contact_count_ratio'].to_list()[:1200]) #最初の2500stepに制限
           phis.append(df['phi'].to_list()[:1200])
 
 
-    print(f"{len(contact_count_ratios)=}")
-    print(f"{len(phis)=}")
 
     plot_mean_with_std_dual_axis(contact_count_ratios, phis, args.out)
-    #save_summary_stats_dual_axis(contact_count_ratios, phis, args.raw_data, data1_name="contact count ratio", data2_name="phi")
 
 if __name__ == "__main__":
     main()

@@ -1,151 +1,56 @@
 #!/bin/bash -e
 
-OUT_DIR="step01_calculate_rmsd.out"
+# Define input/output directories
+OUT_DIR="/path/to/output_dir"
+DATA_DIR="/path/to/input_dir"
+
+# Function to process each case
+process_case() {
+  local CASE_PATH=$1
+  local STATE=$2
+
+  for i in {1..100}; do
+    SIMU_DIR=$(printf "sim-%04d" "${i}")
+    INPUT_DCD="${DATA_DIR}/${CASE_PATH}/${SIMU_DIR}/${STATE}.dcd"
+    INPUT_PDB="${DATA_DIR}/${CASE_PATH}/pdb/${STATE}.pdb"
+    OUTPUT_CSV="${OUT_DIR}/${CASE_PATH}/${SIMU_DIR}/${STATE}.csv"
+
+    echo "Processing ${OUTPUT_CSV}"
+
+    if [ ! -f "${INPUT_DCD}" ]; then
+      echo "Skipping: ${STATE}.dcd not found in ${INPUT_DCD}"
+      continue
+    fi
+
+    mkdir -p "$(dirname "${OUTPUT_CSV}")"
+
+    if [ ! -e "${OUTPUT_CSV}" ]; then
+      uv run \
+        --with numpy \
+        --with pandas \
+        --with MDAnalysis \
+        ./step01_calculate_rmsd.py \
+          --target-region "resid 7516-8266" \
+          --dcd "${INPUT_DCD}" \
+          --pdb "${INPUT_PDB}" \
+          --out "${OUTPUT_CSV}"
+    fi
+  done
+}
 
 ############################################################
-# Experiment 9
+# Processing all cases
 ############################################################
-DATA_DIR="../../4EA4-231F/experiment-09"
-EXP_TYPE="experiment-09"
 
-#------------------------------------------------------------
-# Case 1
-CASE_DIR="kinesin"
-STATE="free"
+# Case 1: kinesin, free
+process_case "kinesin" "free"
 
-# Process all the simulation runs
-for i in {1..100}; do
-  echo "Processing ${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}"
-  # Define simulation directory
-  SIMU_DIR=$(printf "sim-%04d" "${i}")
+# Case 2: kinesin-no-neckmimic, free
+process_case "kinesin-no-neckmimic" "free"
 
-  # Skip if .dcd file does not exist
-  if [ ! -f "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/${STATE}.dcd" ]; then
-    echo "Skipping: ${STATE}.dcd not found in ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    continue
-  fi
+# Case 3: kinesin, alf3
+process_case "kinesin" "alf3"
 
-  # Create output directory
-  mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}"
+# Case 4: kinesin-no-neckmimic, alf3
+process_case "kinesin-no-neckmimic" "alf3"
 
-  # Process trajectory if output does not exist
-  if [ ! -e "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}/${STATE}.csv" ]; then
-    echo "Processing ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    uv run \
-      --with numpy \
-      --with pandas \
-      --with MDAnalysis \
-        ./step01_calculate_rmsd.py \
-          --target-region "resid 7516-8266" \
-          --dcd "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/${STATE}.dcd" \
-          --pdb "${DATA_DIR}/${CASE_DIR}/pdb/${STATE}.pdb" \
-          --out "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}/${STATE}.csv"
-  fi
-done
-
-
-#------------------------------------------------------------
-# Case 2
-CASE_DIR="kinesin-no-neckmimic"
-STATE="free"
-
-# Process all the simulation runs
-for i in {1..100}; do
-  echo "Processing ${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}"
-  # Define simulation directory
-  SIMU_DIR=$(printf "sim-%04d" "${i}")
-
-  # Skip if .dcd file does not exist
-  if [ ! -f "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/${STATE}.dcd" ]; then
-    echo "Skipping: ${STATE}.dcd not found in ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    continue
-  fi
-
-  # Create output directory
-  mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}"
-
-  # Process trajectory if output does not exist
-  if [ ! -e "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}/${STATE}.csv" ]; then
-    echo "Processing ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    uv run \
-      --with numpy \
-      --with pandas \
-      --with MDAnalysis \
-        ./step01_calculate_rmsd.py \
-          --target-region "resid 7516-8266" \
-          --dcd "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/${STATE}.dcd" \
-          --pdb "${DATA_DIR}/${CASE_DIR}/pdb/${STATE}.pdb" \
-          --out "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}/${STATE}.csv"
-  fi
-done
-
-#------------------------------------------------------------
-# Case 3
-CASE_DIR="kinesin"
-STATE="alf3"
-
-# Process all the simulation runs
-for i in {1..100}; do
-  echo "Processing ${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}"
-  # Define simulation directory
-  SIMU_DIR=$(printf "sim-%04d" "${i}")
-
-  # Skip if .dcd file does not exist
-  if [ ! -f "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/${STATE}.dcd" ]; then
-    echo "Skipping: ${STATE}.dcd not found in ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    continue
-  fi
-
-  # Create output directory
-  mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}"
-
-  # Process trajectory if output does not exist
-  if [ ! -e "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}/${STATE}.csv" ]; then
-    echo "Processing ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    uv run \
-      --with numpy \
-      --with pandas \
-      --with MDAnalysis \
-        ./step01_calculate_rmsd.py \
-          --target-region "resid 7516-8266" \
-          --dcd "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/${STATE}.dcd" \
-          --pdb "${DATA_DIR}/${CASE_DIR}/pdb/${STATE}.pdb" \
-          --out "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}/${STATE}.csv"
-  fi
-done
-
-
-#------------------------------------------------------------
-# Case 4
-CASE_DIR="kinesin-no-neckmimic"
-STATE="alf3"
-
-# Process all the simulation runs
-for i in {1..100}; do
-  echo "Processing ${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}"
-  # Define simulation directory
-  SIMU_DIR=$(printf "sim-%04d" "${i}")
-
-  # Skip if .dcd file does not exist
-  if [ ! -f "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/${STATE}.dcd" ]; then
-    echo "Skipping: ${STATE}.dcd not found in ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    continue
-  fi
-
-  # Create output directory
-  mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}"
-
-  # Process trajectory if output does not exist
-  if [ ! -e "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}/${STATE}.csv" ]; then
-    echo "Processing ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    uv run \
-      --with numpy \
-      --with pandas \
-      --with MDAnalysis \
-        ./step01_calculate_rmsd.py \
-          --target-region "resid 7516-8266" \
-          --dcd "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/${STATE}.dcd" \
-          --pdb "${DATA_DIR}/${CASE_DIR}/pdb/${STATE}.pdb" \
-          --out "${OUT_DIR}/${EXP_TYPE}/${CASE_DIR}/${SIMU_DIR}/${STATE}.csv"
-  fi
-done

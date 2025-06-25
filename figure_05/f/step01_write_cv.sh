@@ -1,58 +1,14 @@
 #!/bin/bash -e
 
-OUT_DIR="step01_write_cv.out"
-
-############################################################
-# Experiment 5
-############################################################
-DATA_DIR="../experiment-05"
-
-#------------------------------------------------------------
-# Case 1
-#CASE_DIR="kinesin"
-#
-## Process all the simulation runs
-#for i in {1..100}; do
-#  # Define simulation directory
-#  SIMU_DIR=$(printf "sim-%04d" "${i}")
-#
-#  # Create output directory
-#  mkdir -p "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}"
-#
-#  # Process trajectory if output does not exist
-#  if [ ! -e "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet" ]; then
-#    echo "Processing ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-#    uv run \
-#      --with numpy \
-#      --with polars \
-#      --with MDAnalysis \
-#        ./step01_write_cv.py \
-#          --sel-stalk1 "resid 7516-7568" \
-#          --sel-stalk2 "resid 7899-7951" \
-#          --sel-msu1 "resid 836-1252" \
-#          --sel-msu2 "resid 2506-2922" \
-#          --sel-msu3 "resid 4593-5010" \
-#          --dcd "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.dcd" \
-#          --pdb "${DATA_DIR}/${CASE_DIR}/pdb/free.pdb" \
-#          --out "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet"
-#  fi
-#done
-
-#------------------------------------------------------------
-# Case 2
-CASE_DIR="kinesin-no-neckmimic"
-
-# Process all the simulation runs
 for i in {1..100}; do
   # Define simulation directory
   SIMU_DIR=$(printf "sim-%04d" "${i}")
 
   # Create output directory
-  mkdir -p "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}"
+  mkdir -p /path/to/out_dir
 
   # Process trajectory if output does not exist
-  if [ ! -e "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet" ]; then
-    echo "Processing ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
+  if [ ! -e "/path/to/out_dir/trajectory.parquet" ]; then
     uv run \
       --with numpy \
       --with polars \
@@ -63,106 +19,9 @@ for i in {1..100}; do
           --sel-msu1 "resid 836-1252" \
           --sel-msu2 "resid 2506-2922" \
           --sel-msu3 "resid 4593-5010" \
-          --dcd "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.dcd" \
-          --pdb "${DATA_DIR}/${CASE_DIR}/pdb/free.pdb" \
-          --out "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet"
+          --dcd /path/to/trajectory.dcd \
+          --pdb /path/to/free.pdb \
+          --out /path/to/out_dir/trajectory.parquet
   fi
 done
 
-############################################################
-# Experiment 6
-############################################################
-DATA_DIR="../experiment-06"
-
-#------------------------------------------------------------
-# Case 1
-CASE_DIR="oNMxMBD"
-
-# Process all the simulation runs
-for i in {1..100}; do
-  # Define simulation directory
-  SIMU_DIR=$(printf "sim-%04d" "${i}")
-
-  # Create output directory
-  mkdir -p "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}"
-
-  # Process trajectory if output does not exist
-  if [ ! -e "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet" ]; then
-    echo "Processing ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    uv run \
-      --with numpy \
-      --with polars \
-      --with MDAnalysis \
-        ./step01_write_cv.py \
-          --sel-stalk1 "resid 7516-7568" \
-          --sel-stalk2 "resid 7899-7951" \
-          --sel-msu1 "resid 836-1252" \
-          --sel-msu2 "resid 2506-2922" \
-          --sel-msu3 "resid 4593-5010" \
-          --dcd "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.dcd" \
-          --pdb "${DATA_DIR}/${CASE_DIR}/pdb/free.pdb" \
-          --out "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet"
-  fi
-done
-
-#------------------------------------------------------------
-# Case 2
-CASE_DIR="xNMoMBD"
-
-# Process all the simulation runs
-for i in {1..100}; do
-  # Define simulation directory
-  SIMU_DIR=$(printf "sim-%04d" "${i}")
-
-  # Create output directory
-  mkdir -p "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}"
-
-  # Process trajectory if output does not exist
-  if [ ! -e "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet" ]; then
-    echo "Processing ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    uv run \
-      --with numpy \
-      --with polars \
-      --with MDAnalysis \
-        ./step01_write_cv.py \
-          --sel-stalk1 "resid 7516-7568" \
-          --sel-stalk2 "resid 7899-7951" \
-          --sel-msu1 "resid 836-1252" \
-          --sel-msu2 "resid 2506-2922" \
-          --sel-msu3 "resid 4593-5010" \
-          --dcd "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.dcd" \
-          --pdb "${DATA_DIR}/${CASE_DIR}/pdb/free.pdb" \
-          --out "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet"
-  fi
-done
-
-#------------------------------------------------------------
-# Case 3
-CASE_DIR="xNMxMBD"
-
-# Process all the simulation runs
-for i in {1..100}; do
-  # Define simulation directory
-  SIMU_DIR=$(printf "sim-%04d" "${i}")
-
-  # Create output directory
-  mkdir -p "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}"
-
-  # Process trajectory if output does not exist
-  if [ ! -e "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet" ]; then
-    echo "Processing ${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}"
-    uv run \
-      --with numpy \
-      --with polars \
-      --with MDAnalysis \
-        ./step01_write_cv.py \
-          --sel-stalk1 "resid 7516-7568" \
-          --sel-stalk2 "resid 7899-7951" \
-          --sel-msu1 "resid 836-1252" \
-          --sel-msu2 "resid 2506-2922" \
-          --sel-msu3 "resid 4593-5010" \
-          --dcd "${DATA_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.dcd" \
-          --pdb "${DATA_DIR}/${CASE_DIR}/pdb/free.pdb" \
-          --out "${OUT_DIR}/${CASE_DIR}/${SIMU_DIR}/trajectory.parquet"
-  fi
-done

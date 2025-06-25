@@ -1,105 +1,90 @@
-# Kinesin φ-Angle Transition Histogram Analysis
 
-This repository contains a pipeline for computing and visualizing the dynamics of φ (azimuthal angle) transitions in coarse-grained simulations of kinesin with or without the neck-mimic structure.
+# Collective Variable Analysis Pipeline for Kinesin Simulations (Histogram and Time Evolution)
 
----
+This repository contains a set of scripts for calculating and visualizing collective variables (CVs), including theta, phi, contact count ratio, and RMSD, from molecular dynamics (MD) simulations of kinesin systems with or without the neck mimic domain.
 
-## File Overview
+## Directory Structure
 
 ```
-├── step01_write_cv.py      # Computes θ/φ angles and contact metrics from trajectories
-├── step01_write_cv.sh      # Batch script to apply CV extraction across simulation cases
-├── step02_plot_cv.py       # Plots φ histogram time evolution with reference state overlays
-├── step02_plot_cv.sh       # Batch script for histogram generation
+.
+├── step01_write_cv.py           # Extract CVs (theta, phi, contact ratio, RMSD) from trajectories
+├── step01_write_cv.sh           # Bash script to run CV extraction for multiple simulations
+├── step02_plot_cv.py            # Plot time-evolving histograms with comparisons to equilibrium distributions
+├── step02_plot_cv.sh            # Bash script to automate plotting
+├── output/                      # Output files (parquet, csv, pdf)
+└── input/                       # Input trajectory and topology files
 ```
 
----
+## Requirements
 
-## Step 1: Compute Collective Variables
+- Python >= 3.8
+- Python libraries:
+  - numpy
+  - pandas
+  - polars
+  - matplotlib
+  - seaborn
+  - pyarrow
+  - fastparquet
+  - MDAnalysis
+  - tqdm
+  - msm_utils (for native contact analysis)
 
-### `step01_write_cv.py`
+## Step 1: Extract Collective Variables
 
-This script calculates:
-- Spherical angles θ and φ from stalk orientation in rotated microtubule-aligned coordinates.
-- Native contact ratio and RMSD using `msm_utils.angle_vs_contacts`.
+**Script:** `step01_write_cv.py`  
+**Example usage:**
 
-#### Input Arguments
+```bash
+python step01_write_cv.py \
+  --sel-stalk1 "resid 7516-7568" \
+  --sel-stalk2 "resid 7899-7951" \
+  --sel-msu1 "resid 836-1252" \
+  --sel-msu2 "resid 2506-2922" \
+  --sel-msu3 "resid 4593-5010" \
+  --dcd /path/to/trajectory.dcd \
+  --pdb /path/to/topology.pdb \
+  --itp /path/to/topology.itp \
+  --out /path/to/output/trajectory.parquet
+```
 
-- `--sel-stalk1`, `--sel-stalk2`: Residue selection strings for stalk vector endpoints.
-- `--sel-msu1`, `--sel-msu2`, `--sel-msu3`: MT residues to define orthonormal basis vectors.
-- `--pdb`, `--dcd`: Topology and trajectory.
-- `--itp`: ITP file for contact mapping.
-- `--out`: Output `.parquet` file.
-
-#### Output
-
-A `.parquet` file with:
-- `theta`, `phi`: angular data
-- `contact_count_ratio`, `rmsd`: contact analysis
-
----
-
-### `step01_write_cv.sh`
-
-Runs `step01_write_cv.py` over a set of simulations (e.g., `sim-0001` to `sim-0100`) under the `kinesin` case.
+Or execute in batch:
 
 ```bash
 bash step01_write_cv.sh
 ```
 
-Output is saved under `step01_write_cv.out/<case>/<sim-ID>/trajectory.parquet`.
+**Note:** Please modify the file paths in the bash scripts according to your environment.
 
----
+## Step 2: Plot Time-evolving Histograms
 
-## Step 2: Plot Histogram of Transition Behavior
+**Script:** `step02_plot_cv.py`  
+**Example usage:**
 
-### `step02_plot_cv.py`
+```bash
+python step02_plot_cv.py \
+  --dir /path/to/data_dir \
+  --out /path/to/output/out.pdf \
+  --raw-data /path/to/output/data.csv
+```
 
-This script:
-- Loads φ values from successful transition paths.
-- Aligns the trajectories at the point of neck-mimic docking (contact ratio > 0.99).
-- Calculates histogram over time and overlays ±1 std bands of reference free/AlF₃ states.
-- Saves PDF plot.
-
-#### Input Arguments
-
-- `--dir`: Input directory containing `.parquet` files
-- `--out`: Output plot file (`.pdf`)
-- `--target` *(optional)*: Index of a specific simulation to analyze
-
----
-
-### `step02_plot_cv.sh`
-
-Wrapper for running `step02_plot_cv.py` with predefined data and output paths.
+Or execute in batch:
 
 ```bash
 bash step02_plot_cv.sh
 ```
 
-Results are saved in `step02_plot_cv.out/<case>/`.
+**Note:** Please modify the file paths in the bash scripts according to your environment.
 
----
+## Output
 
-## Dependencies
-
-- `numpy`
-- `pandas`
-- `polars`
-- `matplotlib`
-- `seaborn`
-- `MDAnalysis`
-- `pyarrow` or `fastparquet`
-- `tqdm`
-
-Use [`uv`](https://github.com/astral-sh/uv) for environment isolation during execution.
-
----
+- Parquet files containing the collective variables (`theta`, `phi`, contact ratio, RMSD)
+- CSV summaries of histogram data over time
+- PDF files showing time-evolving histograms with overlays of equilibrium state distributions
 
 ## Notes
 
-- The `φ` angle reflects rotational changes in kinesin stalk, critical for understanding neck-mimic interaction.
-- Only transitions that result in successful docking (contact ratio > 0.99) and path1 (positive direction) are included in the plot.
-- Reference state distributions (`free.csv`, `alf3.csv`) must exist under `../analysis-04/step02_plot_distributions.out/`.
-
-
+- This pipeline uses MDAnalysis for trajectory handling.
+- Spherical angles (`theta`, `phi`) are calculated relative to a dynamically defined coordinate system based on microtubule subunits.
+- Contact count ratio and RMSD are computed using `msm_utils` based native contact analysis.
+- The plotting script compares dynamic CV distributions during transition to equilibrium distributions (e.g., free vs. AlF3 states) for validation.

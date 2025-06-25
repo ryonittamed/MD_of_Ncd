@@ -82,9 +82,6 @@ def plot_data_distribution_histogram_with_overlay(x, y, z, save_path, bins=10, p
     # y軸の反転（カウントダウン表示）
     ax.invert_yaxis()
 
-    # 軸の目盛りの数値だけ非表示にする（目盛り線や軸線は残す）
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
 
     # 凡例を追加
     #ax.legend()
@@ -191,7 +188,6 @@ def extract_transition2(df, previous_steps=20, post_steps=20):
     # その行までのデータを取得
     df_subset = df.loc[idx-previous_steps:idx+post_steps]
     if len(df_subset) != (previous_steps + post_steps + 1):
-      print(f"{len(df_subset)=}")
       return None, "path2"
     return df_subset, 'path1'
   elif last_phi < -1:
@@ -247,9 +243,6 @@ def main():
 
     mean_df = pd.concat(df_list).groupby(level=0).mean()
     phis = np.array([df['phi'].values for df in df_list])
-    print(phis)
-    print(phis.shape)
-    print(sum(phis[:,51] > 2.2) / phis.shape[0]) #neck-mimic docks時点でalf3 stateをとる割合を計算
 
     free = pd.read_csv("../analysis-04/step02_plot_distributions.out/free.csv")
     alf3 = pd.read_csv("../analysis-04/step02_plot_distributions.out/alf3.csv")
@@ -257,7 +250,6 @@ def main():
     alf3 = alf3[(alf3['phi'] > phis.min()) & (alf3['phi'] < phis.max())]
 
     plot_data_distribution_histogram_with_overlay(phis.T, free["phi"].to_numpy(), alf3["phi"].to_numpy(), args.out, bins=30, previous_steps=50)
-    #save_histogram_data(phis.T, args.raw_data, bins=30, previous_steps=50)
 
 if __name__ == "__main__":
     main()

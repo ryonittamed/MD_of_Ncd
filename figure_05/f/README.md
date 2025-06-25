@@ -1,111 +1,94 @@
-# Collective Variable Analysis and Comparison for Kinesin Simulations
 
-This repository contains scripts for extracting, processing, and comparing collective variables (CVs) such as angular orientation and neck-mimic contact behavior from coarse-grained molecular dynamics (MD) simulations of kinesin under different conditions.
+# Collective Variable Analysis Pipeline for Kinesin Simulations
 
----
+This repository contains a set of scripts for extracting and visualizing collective variables (CVs), specifically theta and phi angles, from molecular dynamics (MD) simulations of kinesin systems with and without the neck mimic domain.
 
-## Files Overview
+## Directory Structure
 
 ```
-├── step01_write_cv.py      # Extracts θ/φ angles from kinesin stalk orientation
-├── step01_write_cv.sh      # Batch processing script for multiple simulation cases
-├── step02_plot_cv.py       # Compares CV trajectories (e.g., φ angle) across cases and generates plots
-├── step02_plot_cv.sh       # Runs plotting script for both neck-mimic and no-neck-mimic conditions
-├── color_config.py         # Centralized color configuration used in plotting
+.
+├── step01_write_cv.py           # Extract CVs (theta, phi) from trajectories
+├── step01_write_cv.sh           # Bash script to run CV extraction for multiple simulations
+├── step02_plot_cv.py            # Plot time series distributions of CVs
+├── step02_plot_cv.sh            # Bash script to automate plotting
+├── color_config.py              # Color settings for plots
+├── output/                      # Output files (parquet, csv, pdf)
+└── input/                       # Input trajectory and topology files
 ```
 
----
+## Requirements
+
+- Python >= 3.8
+- Python libraries:
+  - numpy
+  - pandas
+  - polars
+  - matplotlib
+  - seaborn
+  - pyarrow
+  - fastparquet
+  - MDAnalysis
 
 ## Step 1: Extract Collective Variables
 
-### `step01_write_cv.py`
+**Script:** `step01_write_cv.py`  
+**Example usage:**
 
-This script computes θ (polar) and φ (azimuthal) angles from the kinesin stalk vector in a rotated coordinate system defined by three microtubule subunits.
+```bash
+python step01_write_cv.py \
+  --sel-stalk1 "resid 7516-7568" \
+  --sel-stalk2 "resid 7884-7936" \
+  --sel-msu1 "resid 836-1252" \
+  --sel-msu2 "resid 2506-2922" \
+  --sel-msu3 "resid 4593-5010" \
+  --dcd /path/to/trajectory.dcd \
+  --pdb /path/to/topology.pdb \
+  --out /path/to/output/trajectory.parquet
+```
 
-### Arguments
-
-- `--sel-stalk1`, `--sel-stalk2`: Atom selection strings for stalk segments
-- `--sel-msu1`, `--sel-msu2`, `--sel-msu3`: Microtubule subunit selections for coordinate alignment
-- `--pdb`: PDB file for topology
-- `--dcd`: DCD file for trajectory
-- `--out`: Output file path (Parquet format)
-
-### Output
-
-A `.parquet` file with:
-- `theta`: Polar angle (radians)
-- `phi`: Azimuthal angle (radians)
-
----
-
-### `step01_write_cv.sh`
-
-Batch script for running `step01_write_cv.py` across multiple simulations and experimental conditions (e.g., `kinesin`, `kinesin-no-neckmimic`, etc.).
-
-### Example Usage
+Or execute in batch:
 
 ```bash
 bash step01_write_cv.sh
 ```
 
-Output files will be saved under `step01_write_cv.out/<case>/<sim-ID>/trajectory.parquet`.
+**Note:** Please modify the file paths in the bash scripts according to your environment.
 
----
+## Step 2: Plot CV Distributions
 
-## Step 2: Compare Simulation Outcomes
+**Script:** `step02_plot_cv.py`  
+**Example usage:**
 
-### `step02_plot_cv.py`
+```bash
+python step02_plot_cv.py \
+  --kinesin /path/to/with_neckmimic_dir \
+  --no-kinesin /path/to/no_neckmimic_dir \
+  --out /path/to/output/out.pdf \
+  --raw-data /path/to/output/data.csv
+```
 
-This script reads the CVs from two simulation conditions (with and without neck-mimic), selects transitions of interest, calculates statistical summaries (mean, percentile), and outputs a comparative plot.
-
-### Arguments
-
-- `--kinesin`: Path to Parquet files for kinesin with neck-mimic
-- `--no-kinesin`: Path to Parquet files for kinesin without neck-mimic
-- `--out`: Output PDF path for the comparison plot
-- `--raw-data`: Output CSV file for statistical summary
-
-### Output
-
-- A plot (`out.pdf`) comparing φ angle dynamics between conditions
-- A CSV (`data.csv`) summarizing means, medians, and percentiles across MD time
-
----
-
-### `step02_plot_cv.sh`
-
-Runs `step02_plot_cv.py` using `uv` for environment isolation.
-
-### Example Usage
+Or execute in batch:
 
 ```bash
 bash step02_plot_cv.sh
 ```
 
-Results are saved under `step02_plot_cv.out/`.
+**Note:** Please modify the file paths in the bash scripts according to your environment.
 
----
+## Color Configurations
 
-## Dependencies
+The file `color_config.py` defines the color codes used consistently across all plots:
+- `with_neckmimic`: Blue (`#0072B2`)
+- `without_neckmimic`: Olive (`#6A6F2E`)
 
-These scripts require the following Python packages:
+## Output
 
-- `numpy`
-- `polars`
-- `pandas`
-- `matplotlib`
-- `seaborn`
-- `MDAnalysis`
-- `pyarrow` or `fastparquet`
-
-Execution assumes the use of `uv` to manage dependencies.
-
----
+- Parquet files containing the collective variables (`theta`, `phi`)
+- CSV summary of trajectory data
+- PDF files visualizing time series distributions with confidence intervals
 
 ## Notes
 
-- Raw MD trajectory files are not included.
-- Path filtering excludes simulations that undergo undesired transitions.
-- Angle unwrapping and trajectory slicing are applied before statistics and plotting.
-- Colors are defined in `color_config.py` for consistency across figures.
-
+- This pipeline uses MDAnalysis for trajectory handling.
+- Spherical angles (`theta`, `phi`) are calculated relative to a dynamically defined coordinate system based on microtubule subunits.
+- Trajectories showing transitions to abnormal paths are filtered based on heuristics applied to the `phi` angle.

@@ -1,113 +1,90 @@
-# Collective Variable Analysis and Visualization Pipeline
 
-This repository contains scripts to compute and visualize collective variables (CVs) from molecular dynamics simulations of kinesin in various biochemical states.
+# Collective Variable Analysis Pipeline
+
+This repository contains a set of scripts for calculating and visualizing collective variables (CVs) from molecular dynamics (MD) simulations, specifically for kinesin systems with or without the neck mimic domain.
 
 ## Directory Structure
 
 ```
 .
-├── step01_write_cv.py            # Computes spherical coordinates from MD trajectories
-├── step01_write_cv.sh            # Batch processes multiple simulations
-├── step02_plot_distributions.py  # Visualizes 2D KDE plots of the computed CVs
-├── step02_plot_distributions.sh  # Runs plotting script for different states
-├── color_config.py               # Color definitions for plotting
+├── step01_write_cv.py           # Extract CVs (theta, phi) from trajectories
+├── step01_write_cv.sh           # Bash script to run CV extraction for multiple trajectories
+├── step02_plot_distributions.py # Plot joint KDE of theta and phi distributions
+├── step02_plot_distributions.sh # Bash script to automate plotting for multiple states
+├── color_config.py              # Color settings for plots
+├── output/                      # Output files (parquet, csv, pdf)
+└── input/                       # Input trajectory and topology files
 ```
 
----
+## Requirements
 
-## Step 1: Compute Collective Variables
+- Python >= 3.8
+- Python libraries:
+  - numpy
+  - pandas
+  - polars
+  - matplotlib
+  - seaborn
+  - pyarrow
+  - fastparquet
+  - MDAnalysis
 
-### `step01_write_cv.py`
+## Step 1: Extract Collective Variables
 
-This script calculates spherical coordinates (θ and φ) of the stalk vector in a rotated coordinate system defined by three microtubule subunits.
+**Script:** `step01_write_cv.py`  
+**Example usage:**
 
-### Arguments
+```bash
+python step01_write_cv.py \
+  --sel-stalk1 "resid 7516-7568" \
+  --sel-stalk2 "resid 7884-7936" \
+  --sel-msu1 "resid 836-1252" \
+  --sel-msu2 "resid 2506-2922" \
+  --sel-msu3 "resid 4593-5010" \
+  --dcd /path/to/trajectory.dcd \
+  --pdb /path/to/topology.pdb \
+  --out /path/to/output/trajectory.parquet
+```
 
-- `--sel-stalk1`, `--sel-stalk2`: Atom selection strings for two stalk segments.
-- `--sel-msu1`, `--sel-msu2`, `--sel-msu3`: Selection strings for three microtubule subunits (to define coordinate axes).
-- `--pdb`: Topology file (PDB format).
-- `--dcd`: Trajectory file (DCD format).
-- `--out`: Output file name (Parquet format).
-
-### Output
-
-A `.parquet` file containing two columns:
-- `theta`: Polar angle in radians.
-- `phi`: Azimuthal angle in radians.
-
----
-
-## Step 1 (Batch): Process Multiple Simulations
-
-### `step01_write_cv.sh`
-
-This shell script batch-processes multiple simulation cases and replicates. It automatically runs `step01_write_cv.py` across all simulations, generating `trajectory.parquet` files for each.
-
-### How to Run
+Or execute in batch:
 
 ```bash
 bash step01_write_cv.sh
 ```
 
-> Uses `uv` to manage dependencies and isolate environments per run.
-
----
+**Note:** Please modify the file paths in the bash scripts according to your environment.
 
 ## Step 2: Plot Distributions
 
-### `step02_plot_distributions.py`
+**Script:** `step02_plot_distributions.py`  
+**Example usage:**
 
-This script reads CV data and produces 2D KDE plots with marginal distributions. It compares two simulation conditions (e.g., with and without neck mimic).
+```bash
+python step02_plot_distributions.py \
+  --dirs /path/to/kinesin.equiliblium /path/to/kinesin-no-neckmimic.equiliblium \
+  --out_dir /path/to/output \
+  --state free
+```
 
-### Arguments
-
-- `--dirs`: One or more directories containing `.csv` files of CVs (e.g., `"free.csv"` or `"alf3.csv"`).
-- `--out_dir`: Output directory for the plot.
-- `--state`: A label indicating which dataset to visualize (e.g., `"free"` or `"alf3"`).
-
-### Output
-
-- `hist_eq_free_revised.pdf`  
-- `hist_eq_alf3_revised.pdf`  
-  2D KDE plots with marginals comparing `theta` and `phi` distributions.
-
----
-
-## Step 2 (Batch): Run Plotting Commands
-
-### `step02_plot_distributions.sh`
-
-This script runs `step02_plot_distributions.py` for both `"free"` and `"alf3"` states using the output from Step 1.
-
-### How to Run
+Or execute in batch:
 
 ```bash
 bash step02_plot_distributions.sh
 ```
 
-### Output Directory
+**Note:** Please modify the file paths in the bash scripts according to your environment.
 
-All plots are saved in `step02_plot_distributions.out/`.
+## Color Configurations
 
----
+The file `color_config.py` defines the color codes used consistently across all plots.
 
-## Dependencies
+## Output
 
-These scripts assume use of the following Python packages (managed via `uv`):
-
-- `numpy`
-- `polars`
-- `pandas`
-- `MDAnalysis`
-- `matplotlib`
-- `seaborn`
-- `pyarrow` / `fastparquet` (for `.parquet` handling)
-
----
+- Parquet or CSV files containing the collective variable data (`theta`, `phi`).
+- PDF files of KDE plots visualizing the joint distribution of `theta` and `phi`.
 
 ## Notes
 
-- Input files (`trajectory.dcd`, `free.pdb`) and raw data are not included in the repository.
-- Please contact the corresponding author for access to simulation input/output files.
-- Angle unwrapping and path filtering are handled within the plotting script to exclude biologically implausible transitions.
-
+- This pipeline uses MDAnalysis for trajectory handling.
+- It calculates spherical angles relative to a dynamically defined coordinate system based on microtubule subunits.
+- Trajectories showing abnormal paths are automatically filtered based on a heuristic applied to the `phi` angle.

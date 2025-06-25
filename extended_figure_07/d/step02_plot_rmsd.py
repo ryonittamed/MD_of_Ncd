@@ -134,40 +134,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", type=str, required=True, help="Directory containing CVs in csv format")
     parser.add_argument("--out", type=str, required=True, help="Output file name")
-    parser.add_argument("--raw-data", type=str, required=True, help="Raw data file name")
     parser.add_argument("--state", type=str, required=True, help="free or alf3")
     args = parser.parse_args()
 
-    #colors = generate_colors(len(args.dirs))
-    #labels = [Path(path).stem for path in args.dirs]
-
-    #for color, csv_dir, label in zip(colors, args.dirs, labels):
-    #  rmsd_list = load_rmsd(csv_dir, average_window=1000)
-    #  for i,rmsd in enumerate(rmsd_list):
-    #    #plt.plot(rmsd, color=color, label=label if i==0 else None, linewidth=0.2)
-    #    # Split trajectory
-    #    sim1 = rmsd.iloc[:2000]
-    #    sim2 = rmsd.iloc[2000:2300]
-    #    sim3 = rmsd.iloc[2300:22300]
-    #    sim4 = rmsd.iloc[22300:22600]
-    #    sim5 = rmsd.iloc[22600:42600]
-    #    colors_ = generate_colors(5)
-    #    for c,sim in zip(colors_, [sim1, sim2, sim3, sim4, sim5]):
-    #      plt.plot(sim, color=c, linewidth=0.2)
-    #    # Split trajectory
     
     df_list = load_rmsd(args.dir, state=args.state, average_window=None)
 
     #Plot Figures
     plot_mean_and_std(df_list, save_path=args.out)
 
-    #Save raw data
-    #save_mean_std_from_df_list_to_csv(df_list, filename=args.raw_data)
-           
-
-    #plt.legend()
-    #plt.savefig(args.out, dpi=300)
-    #plt.close()
 
       
 

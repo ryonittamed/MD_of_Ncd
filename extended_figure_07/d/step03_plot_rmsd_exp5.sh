@@ -1,44 +1,36 @@
 #!/bin/bash -e
 
-OUT_DIR="step02_plot_rmsd.out"
-DATA_DIR="step01_calculate_rmsd.old.out"
+# Define input/output directories
+OUT_DIR="/path/to/output_dir"
+DATA_DIR="/path/to/input_dir"
 
 # Create output directory
-mkdir -p "${OUT_DIR}/"
+mkdir -p "${OUT_DIR}"
 
+# Function to plot RMSD for experiment 05
+plot_rmsd_exp5() {
+  local CASE_PATH=$1
 
-##############################################################
-# Experiment 05
-#############################################################
-EXP_TYPE="experiment-05"
+  mkdir -p "${OUT_DIR}/${CASE_PATH}"
 
-CASE="kinesin"
-mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE}"
-
-# Plot cv files
-uv run \
-  --with polars \
-  --with matplotlib \
-  --with pandas \
-  --with pyarrow \
-  --with fastparquet \
+  uv run \
+    --with polars \
+    --with matplotlib \
+    --with pandas \
+    --with pyarrow \
+    --with fastparquet \
     ./step03_plot_rmsd_exp5.py \
-      --dir "${DATA_DIR}/${EXP_TYPE}/${CASE}"\
-      --out "${OUT_DIR}/${EXP_TYPE}/${CASE}/out.pdf" \
-      --raw-data "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/data.csv" 
+      --dir "${DATA_DIR}/${CASE_PATH}" \
+      --out "${OUT_DIR}/${CASE_PATH}/out.pdf" \
+}
 
-CASE="kinesin-no-neckmimic"
-mkdir -p "${OUT_DIR}/${EXP_TYPE}/${CASE}"
+###############################################
+# Process all cases
+###############################################
 
-# Plot cv files
-uv run \
-  --with polars \
-  --with matplotlib \
-  --with pandas \
-  --with pyarrow \
-  --with fastparquet \
-    ./step03_plot_rmsd_exp5.py \
-      --dir "${DATA_DIR}/${EXP_TYPE}/${CASE}"\
-      --out "${OUT_DIR}/${EXP_TYPE}/${CASE}/out.pdf" \
-      --raw-data "${OUT_DIR}/${EXP_TYPE}/${CASE}/${STATE}/data.csv" 
+# kinesin
+plot_rmsd_exp5 "kinesin"
+
+# kinesin-no-neckmimic
+plot_rmsd_exp5 "kinesin-no-neckmimic"
 

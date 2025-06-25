@@ -78,12 +78,6 @@ def plot_2d_kde_with_marginals(df_x: pd.DataFrame, df_y: pd.DataFrame, save_path
     ax_ydist.get_xaxis().set_visible(False)
     ax_ydist.get_yaxis().set_visible(False)
 
-    # 軸の目盛りの数値だけ非表示にする（目盛り線や軸線は残す）
-    ax_main.set_xticklabels([])
-    ax_main.set_yticklabels([])
-    ax_main.set_xlabel("")
-    ax_main.set_ylabel("")
-
     # 画像の保存
     plt.savefig(save_path, bbox_inches="tight", dpi=300, format='pdf')
     plt.show()
@@ -133,7 +127,6 @@ def main():
       df_list = []
       indexs = []
       for path in paths:
-          print(path)
           df = pd.read_csv(path)
 
           ## Split trajectory
@@ -154,17 +147,11 @@ def main():
 
 
       data = pd.concat(df_list)
-      print(data)
-      print(f"Number of data of {dirname}:",len(df_list))
 
       # Plot scatter
       sampled_data = data
       if i==0:
         x_min, x_max, y_min, y_max = sampled_data['theta'].min(), sampled_data['theta'].max(), sampled_data['phi'].min(), sampled_data['phi'].max()
-      print(f"{x_min=}")
-      print(f"{y_min=}")
-      print(f"{x_max=}")
-      print(f"{y_max=}")
 
       # add data to all_data
       data['case'] = Path(dirname).name

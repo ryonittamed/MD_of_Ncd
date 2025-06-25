@@ -1,30 +1,34 @@
 #!/bin/bash -e
 
-OUT_DIR="step02_plot_cv.out"
-DATA_DIR="step01_write_cv.out"
+# Define input/output directories
+OUT_DIR="/path/to/output_dir"
+DATA_DIR="/path/to/input_dir"
 
-###############################################
-# Case kinesin
-###############################################
-CASE_DIR="kinesin"
+# Function to plot CV
+plot_cv() {
+  local CASE_PATH=$1
 
-# Create output directory
-mkdir -p "${OUT_DIR}/${CASE_DIR}"
+  mkdir -p "${OUT_DIR}/${CASE_PATH}"
 
-# Plot cv files
-uv run \
-  --with polars \
-  --with matplotlib \
-  --with pandas \
-  --with pyarrow \
-  --with fastparquet \
-  --with seaborn \
+  uv run \
+    --with polars \
+    --with matplotlib \
+    --with pandas \
+    --with pyarrow \
+    --with fastparquet \
+    --with seaborn \
     ./step02_plot_cv.py \
-      --dir "${DATA_DIR}/${CASE_DIR}" \
-      --out "${OUT_DIR}/${CASE_DIR}/norm_out.pdf" \
-      --raw-data "${OUT_DIR}/${CASE_DIR}/data.csv" \
-      --non-norm-out "${OUT_DIR}/${CASE_DIR}/no_norm_out.pdf" \
-      --dock-out "${OUT_DIR}/${CASE_DIR}/dock_out.pdf"
+      --dir "${DATA_DIR}/${CASE_PATH}" \
+      --out "${OUT_DIR}/${CASE_PATH}/norm_out.pdf"
+}
 
+###############################################
+# Process case
+###############################################
 
+# Example case: kinesin
+plot_cv "kinesin"
+
+# Example case: kinesin-no-neckmimic (if needed)
+# plot_cv "kinesin-no-neckmimic"
 

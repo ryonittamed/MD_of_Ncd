@@ -70,12 +70,8 @@ def plot_heatmap(df, save_path, font_size=20, normalize=True):
         fontsize=font_size
     )
 
-    #plt.xlabel("Residue", fontsize=font_size+2)
-    #plt.ylabel(r"MD steps ($\times 10^4$)", fontsize=font_size+5)
-    # 軸の目盛りの数値だけ非表示にする（目盛り線や軸線は残す）
-    ax = plt.gca()
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
+    plt.xlabel("Residue", fontsize=font_size+2)
+    plt.ylabel(r"MD steps ($\times 10^4$)", fontsize=font_size+5)
 
     # カラーバー
     cbar = plt.colorbar(im)
@@ -246,9 +242,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", type=str, required=True, help="Directory containing CVs in parquet format")
     parser.add_argument("--out", type=str, required=True, help="Output file name")
-    parser.add_argument("--raw-data", type=str, required=True, help="Raw Data file name")
-    parser.add_argument("--non-norm-out", type=str, required=True, help="Output file name")
-    parser.add_argument("--dock-out", type=str, required=True, help="Output file name")
     parser.add_argument("--target", type=int, required=False, help="Target simulation number")
     args = parser.parse_args()
 
@@ -290,17 +283,10 @@ def main():
     config = Neckmimic()
 
     converted_df = convert_and_sum_contact_sets(df_list, number_range=config.neckmimic_range, name_mapping=config.resname_dict, column_name='contact_resids_in_neckmimic')
-    docked_df = convert_and_sum_contact_sets(df_list, number_range=config.neckmimic_range, name_mapping=config.resname_dict, column_name='docks')
 
-    #Save data
-    #save_plot_heatmap(converted_df, args.raw_data, normalize=True)
-    #exit()
 
     #Plot
     plot_heatmap(converted_df, args.out, normalize=True)
-    plot_heatmap(converted_df, args.non_norm_out, normalize=False)
-
-    plot_heatmap(docked_df, args.dock_out, normalize=False)
 
 
   

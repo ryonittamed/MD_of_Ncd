@@ -1,48 +1,31 @@
 #!/bin/bash -e
 
-OUT_DIR="step02_plot_rmsd.out"
-DATA_DIR="step01_calculate_rmsd.out"
+# Define input/output directories
+OUT_DIR="/path/to/output_dir"
+DATA_DIR="/path/to/input_dir"
 
 # Create output directory
-mkdir -p "${OUT_DIR}/"
+mkdir -p "${OUT_DIR}"
 
+# Function to process each state
+plot_state() {
+  local STATE=$1
 
-##############################################################
-# Experiment 09
-#############################################################
-EXP_TYPE="experiment-09"
+  mkdir -p "${OUT_DIR}/${STATE}"
 
-STATE="free"
-mkdir -p "${OUT_DIR}/${EXP_TYPE}/${STATE}"
-
-# Plot cv files
-uv run \
-  --with polars \
-  --with matplotlib \
-  --with pandas \
-  --with pyarrow \
-  --with fastparquet \
+  uv run \
+    --with polars \
+    --with matplotlib \
+    --with pandas \
+    --with pyarrow \
+    --with fastparquet \
     ./step02_plot_rmsd.py \
-      --dir-kinesin "${DATA_DIR}/${EXP_TYPE}/kinesin"\
-      --dir-no-kinesin "${DATA_DIR}/${EXP_TYPE}/kinesin-no-neckmimic"\
-      --out "${OUT_DIR}/${EXP_TYPE}/${STATE}/out.pdf" \
-      --raw-data "${OUT_DIR}/${EXP_TYPE}/${STATE}/data.csv" \
+      --dir-kinesin "${DATA_DIR}/kinesin" \
+      --dir-no-kinesin "${DATA_DIR}/kinesin-no-neckmimic" \
+      --out "${OUT_DIR}/${STATE}/out.pdf" \
       --state ${STATE}
+}
 
-STATE="alf3"
-mkdir -p "${OUT_DIR}/${EXP_TYPE}/${STATE}"
-
-# Plot cv files
-uv run \
-  --with polars \
-  --with matplotlib \
-  --with pandas \
-  --with pyarrow \
-  --with fastparquet \
-    ./step02_plot_rmsd.py \
-      --dir-kinesin "${DATA_DIR}/${EXP_TYPE}/kinesin"\
-      --dir-no-kinesin "${DATA_DIR}/${EXP_TYPE}/kinesin-no-neckmimic"\
-      --out "${OUT_DIR}/${EXP_TYPE}/${STATE}/out.pdf" \
-      --raw-data "${OUT_DIR}/${EXP_TYPE}/${STATE}/data.csv" \
-      --state ${STATE}
-
+# Process for states 'free' and 'alf3'
+plot_state "free"
+plot_state "alf3"
